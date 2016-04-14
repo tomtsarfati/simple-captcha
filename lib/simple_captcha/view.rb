@@ -61,6 +61,25 @@ module SimpleCaptcha #:nodoc
       simple_captcha_image(key, options)
     end
 
+
+    def set_simple_captcha_data(key, options={})
+      code_type = options[:code_type]
+
+      value = generate_simple_captcha_data(code_type)
+      data = SimpleCaptcha::SimpleCaptchaData.get_data(key)
+      data.value = value
+      data.save
+      key
+    end
+
+    def simple_captcha_key(key_name = nil)
+      if key_name.nil?
+        session[:captcha] ||= SimpleCaptcha::Utils.generate_key(session[:id].to_s, 'captcha')
+      else
+        SimpleCaptcha::Utils.generate_key(session[:id].to_s, key_name)
+      end
+    end
+
     private
 
       def simple_captcha_image(simple_captcha_key, options = {})
@@ -89,16 +108,6 @@ module SimpleCaptcha #:nodoc
         end
       end
 
-      def set_simple_captcha_data(key, options={})
-        code_type = options[:code_type]
-
-        value = generate_simple_captcha_data(code_type)
-        data = SimpleCaptcha::SimpleCaptchaData.get_data(key)
-        data.value = value
-        data.save
-        key
-      end
-
       def generate_simple_captcha_data(code)
         value = ''
 
@@ -110,14 +119,6 @@ module SimpleCaptcha #:nodoc
         end
 
         return value
-      end
-
-      def simple_captcha_key(key_name = nil)
-        if key_name.nil?
-          session[:captcha] ||= SimpleCaptcha::Utils.generate_key(session[:id].to_s, 'captcha')
-        else
-          SimpleCaptcha::Utils.generate_key(session[:id].to_s, key_name)
-        end
       end
   end
 end
