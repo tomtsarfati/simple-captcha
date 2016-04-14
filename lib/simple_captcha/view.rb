@@ -46,7 +46,7 @@ module SimpleCaptcha #:nodoc
       # key = simple_captcha_key(options[:object])
       # options[:field_value] = set_simple_captcha_data(key, options)
       defaults = {
-         :image => simple_captcha_image(key, options),
+         :image => simple_captcha_image(options[:field_value], options),
          :label => options[:label] || I18n.t('simple_captcha.label'),
          :field => simple_captcha_field(options)
          }
