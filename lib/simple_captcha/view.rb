@@ -43,9 +43,8 @@ module SimpleCaptcha #:nodoc
     #
     # All Feedbacks/CommentS/Issues/Queries are welcome.
     def show_simple_captcha(options={})
-      key = simple_captcha_key(options[:object])
-      options[:field_value] = set_simple_captcha_data(key, options)
-
+      # key = simple_captcha_key(options[:object])
+      # options[:field_value] = set_simple_captcha_data(key, options)
       defaults = {
          :image => simple_captcha_image(key, options),
          :label => options[:label] || I18n.t('simple_captcha.label'),
@@ -57,7 +56,7 @@ module SimpleCaptcha #:nodoc
 
     def generate_simple_captcha_image(options={})
       key = simple_captcha_key(options[:object])
-      options[:field_value] = set_simple_captcha_data(key, options)
+      options[:field_value] = key
       simple_captcha_image(key, options)
     end
 
@@ -69,7 +68,7 @@ module SimpleCaptcha #:nodoc
       data = SimpleCaptcha::SimpleCaptchaData.get_data(key)
       data.value = value
       data.save
-      key
+      data
     end
 
     def simple_captcha_key(key_name = nil)
