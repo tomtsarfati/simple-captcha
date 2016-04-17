@@ -71,12 +71,8 @@ module SimpleCaptcha #:nodoc
       data
     end
 
-    def simple_captcha_key(key_name = nil)
-      if key_name.nil?
-        session[:captcha] ||= SimpleCaptcha::Utils.generate_key(session[:id].to_s, 'captcha')
-      else
-        SimpleCaptcha::Utils.generate_key(session[:id].to_s, key_name)
-      end
+    def simple_captcha_key(id = nil, key_name = nil)
+        SimpleCaptcha::Utils.generate_key(id.to_s, key_name || 'captcha')
     end
 
     private
