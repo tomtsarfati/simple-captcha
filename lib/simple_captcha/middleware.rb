@@ -20,7 +20,19 @@ module SimpleCaptcha
         @app.call(env)
       end
     end
-    
+
+    def send_file(path, options = {})
+      raise MissingFile, "Cannot read file #{path}" unless File.file?(path) and File.readable?(path)
+
+      options[:filename] ||= File.basename(path) unless options[:url_based_filename]
+
+      status = options[:status] || 200
+      headers = {"Content-Disposition" => "#{options[:disposition]}; filename='#{options[:filename]}'", "Content-Type" => options[:type], 'Content-Transfer-Encoding' => 'binary', 'Cache-Control' => 'private'}
+      response_body = File.open(path, "rb")
+      
+      [status, headers, response_body]
+    end
+          
     protected
       def make_image(env, headers = {}, status = 404)
         request = Rack::Request.new(env)
@@ -43,16 +55,6 @@ module SimpleCaptcha
         request_path.include?('/simple_captcha')
       end
       
-      def send_file(path, options = {})
-        raise MissingFile, "Cannot read file #{path}" unless File.file?(path) and File.readable?(path)
 
-        options[:filename] ||= File.basename(path) unless options[:url_based_filename]
-
-        status = options[:status] || 200
-        headers = {"Content-Disposition" => "#{options[:disposition]}; filename='#{options[:filename]}'", "Content-Type" => options[:type], 'Content-Transfer-Encoding' => 'binary', 'Cache-Control' => 'private'}
-        response_body = File.open(path, "rb")
-        
-        [status, headers, response_body]
-      end
   end
 end

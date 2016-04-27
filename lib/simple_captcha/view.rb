@@ -75,45 +75,44 @@ module SimpleCaptcha #:nodoc
         SimpleCaptcha::Utils.generate_key(id.to_s, key_name || 'captcha')
     end
 
-    private
 
-      def simple_captcha_image(simple_captcha_key, options = {})
-        defaults = {}
-        defaults[:time] = options[:time] || Time.now.to_i
+    def simple_captcha_image(simple_captcha_key, options = {})
+      defaults = {}
+      defaults[:time] = options[:time] || Time.now.to_i
 
-        query = defaults.collect{ |key, value| "#{key}=#{value}" }.join('&')
-        url = "#{ENV['RAILS_RELATIVE_URL_ROOT']}/providers/#{options[:provider]}/simplee_captchas?code=#{simple_captcha_key}&#{query}"
-        if options[:object]
-          hidden_captcha_key = hidden_field(options[:object], :captcha_key, :value => options[:field_value])
+      query = defaults.collect{ |key, value| "#{key}=#{value}" }.join('&')
+      url = "#{ENV['RAILS_RELATIVE_URL_ROOT']}/providers/#{options[:provider]}/simplee_captchas?code=#{simple_captcha_key}&#{query}"
+      if options[:object]
+        hidden_captcha_key = hidden_field(options[:object], :captcha_key, :value => options[:field_value])
+      else
+        hidden_captcha_key = hidden_field_tag(:captcha_key, options[:field_value])
+      end
+      tag('img', :src => url, :alt => 'captcha') + hidden_captcha_key
+    end
+
+    def simple_captcha_field(options={})
+      html = {:autocomplete => 'off', :required => 'required'}
+      html.merge!(options[:input_html] || {})
+      html[:placeholder] = options[:placeholder] || I18n.t('simple_captcha.placeholder')
+
+      if options[:object]
+        text_field(options[:object], :captcha, html.merge(:value => ''))
+      else
+        text_field_tag(:captcha, nil, html)
+      end
+    end
+
+    def generate_simple_captcha_data(code)
+      value = ''
+
+      case code
+        when 'numeric' then
+          SimpleCaptcha.length.times{value << (48 + rand(10)).chr}
         else
-          hidden_captcha_key = hidden_field_tag(:captcha_key, options[:field_value])
-        end
-        tag('img', :src => url, :alt => 'captcha') + hidden_captcha_key
+          SimpleCaptcha.length.times{value << (65 + rand(26)).chr}
       end
 
-      def simple_captcha_field(options={})
-        html = {:autocomplete => 'off', :required => 'required'}
-        html.merge!(options[:input_html] || {})
-        html[:placeholder] = options[:placeholder] || I18n.t('simple_captcha.placeholder')
-
-        if options[:object]
-          text_field(options[:object], :captcha, html.merge(:value => ''))
-        else
-          text_field_tag(:captcha, nil, html)
-        end
-      end
-
-      def generate_simple_captcha_data(code)
-        value = ''
-
-        case code
-          when 'numeric' then
-            SimpleCaptcha.length.times{value << (48 + rand(10)).chr}
-          else
-            SimpleCaptcha.length.times{value << (65 + rand(26)).chr}
-        end
-
-        return value
-      end
+      return value
+    end
   end
 end
