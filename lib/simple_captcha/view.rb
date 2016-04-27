@@ -82,7 +82,7 @@ module SimpleCaptcha #:nodoc
         defaults[:time] = options[:time] || Time.now.to_i
 
         query = defaults.collect{ |key, value| "#{key}=#{value}" }.join('&')
-        url = "#{ENV['RAILS_RELATIVE_URL_ROOT']}/simplee_captcha?code=#{simple_captcha_key}&#{query}"
+        url = "#{ENV['RAILS_RELATIVE_URL_ROOT']}/simplee_captchas?code=#{simple_captcha_key}&#{query}"
         if options[:object]
           hidden_captcha_key = hidden_field(options[:object], :captcha_key, :value => options[:field_value])
         else
