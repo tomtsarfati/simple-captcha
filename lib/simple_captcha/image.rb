@@ -55,32 +55,30 @@ module SimpleCaptcha #:nodoc
       end
     end
 
-    private
+    def generate_simple_captcha_image(simple_captcha_key) #:nodoc
+      amplitude, frequency = ImageHelpers.distortion(SimpleCaptcha.distortion)
+      text = Utils::simple_captcha_value(simple_captcha_key)
 
-      def generate_simple_captcha_image(simple_captcha_key) #:nodoc
-        amplitude, frequency = ImageHelpers.distortion(SimpleCaptcha.distortion)
-        text = Utils::simple_captcha_value(simple_captcha_key)
+      params = ImageHelpers.image_params(SimpleCaptcha.image_style).dup
+      params << "-size #{SimpleCaptcha.image_size}"
+      params << "-wave #{amplitude}x#{frequency}"
+      #params << "-gravity 'Center'"
+      params << "-gravity \"Center\""
+      params << "-pointsize #{SimpleCaptcha.point_size}"
+      params << "-implode 0.2"
 
-        params = ImageHelpers.image_params(SimpleCaptcha.image_style).dup
-        params << "-size #{SimpleCaptcha.image_size}"
-        params << "-wave #{amplitude}x#{frequency}"
-        #params << "-gravity 'Center'"
-        params << "-gravity \"Center\""
-        params << "-pointsize #{SimpleCaptcha.point_size}"
-        params << "-implode 0.2"
+      dst = Tempfile.new(RUBY_VERSION < '1.9' ? 'simple_captcha.jpg' : ['simple_captcha', '.jpg'], SimpleCaptcha.tmp_path)
+      dst.binmode
 
-        dst = Tempfile.new(RUBY_VERSION < '1.9' ? 'simple_captcha.jpg' : ['simple_captcha', '.jpg'], SimpleCaptcha.tmp_path)
-        dst.binmode
+      #params << "label:#{text} '#{File.expand_path(dst.path)}'"
+      params << "label:#{text} \"#{File.expand_path(dst.path)}\""
 
-        #params << "label:#{text} '#{File.expand_path(dst.path)}'"
-        params << "label:#{text} \"#{File.expand_path(dst.path)}\""
+      SimpleCaptcha::Utils::run("convert", params.join(' '))
 
-        SimpleCaptcha::Utils::run("convert", params.join(' '))
+      dst.close
 
-        dst.close
-
-        File.expand_path(dst.path)
-        #dst
-      end
+      File.expand_path(dst.path)
+      #dst
+    end
   end
 end

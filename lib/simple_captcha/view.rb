@@ -54,13 +54,6 @@ module SimpleCaptcha #:nodoc
       render :partial => 'simple_captcha/simple_captcha', :locals => { :simple_captcha_options => defaults }
     end
 
-    def generate_simple_captcha_image(options={})
-      key = simple_captcha_key(options[:object])
-      options[:field_value] = key
-      simple_captcha_image(key, options)
-    end
-
-
     def set_simple_captcha_data(key, options={})
       code_type = options[:code_type]
 
